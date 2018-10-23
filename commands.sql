@@ -28,4 +28,4 @@ CREATE TABLE school_information (
 
 /* INSERTING DATA INTO SCHOOL INFORMATION TABLE EXAMPLE */
 INSERT INTO school_information (school_id, school_name, location) 
-VALUES (null, 'Indooroopilly State High School', '11 Ward Street');
+VALUES (null, 'Indooroopilly State High School', '111 Ward Street');
