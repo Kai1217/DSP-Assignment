@@ -3,8 +3,8 @@
 //                                                 //
 //  Made by Kai Matolat                            //     
 //                                                 //
-//  Under the MIT License                          //
 //                                                 //
+//  Under the MIT License                          //
 //                                                 //
 /////////////////////////////////////////////////////
 
@@ -35,32 +35,134 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
 // IMPORTING CONFIG.PHP
 require_once "config.php";
 
-$firstname = $lastname = "";
-$password = $password_err = "";
+$firstname = $lastname = $password = "";
+$password_err = $firstname_err = $lastname_err = "";
 
 // VALIDATE FIRSTNAME
-if(empty(trim($_POST["firstname"])))
+if(isset($_POST['firstname']))
 {
-    $firstname_err = "Please enter a first name.";
+    $firstname = $_POST['firstname'];  
 } else
 {
-    $firstname = trim($_POST["firstname"]);
+    $firstname_err = "Please enter a valid firstname.";
 }
 
 // VALIDATE LASTNAME
-if(empty(trim($_POST["lastname"])))
+if(empty($_POST['lastname']))
 {
-    $lastname_err = "Please enter a last name.";
+    $lastname_err = "Please enter a valid lastname.";
 } else
 {
-    $lastname = trim($_POST["lastname"]);
+    $lastname = $_POST['lastname'];
 }
 
 // VALIDATE PASSWORD
-if(empty(trim($_POST["password"])))
+if(empty($_POST["password"]))
 {
     $password_err = "Please enter a password.";
 } else
 {
-    $password = trim($_POST["password"]);
+    $password = $_POST["password"];
 }
+
+// VALIDATE CREDENTIALS
+if(empty($firstname_err) && empty($lastname_err) && empty($password_err))
+{
+    // PREPARE SELECT STATEMENT
+    $sql = "SELECT `user_id`, firstname, lastname, `password` FROM registered_users WHERE firstname = ? AND lastname = ?";
+
+    if($stmt = mysqli_prepare($connect, $sql))
+    {
+        // BIND VARIABLES TO PARAMETERS
+        mysqli_stmt_bind_param($stmt, "ss", $param_firstname, $param_lastname);
+
+        // SET THE PARAMETERS
+        $param_firstname = $firstname;
+        $param_lastname = $lastname;
+
+        // EXECUTE THE STATEMENT
+        if(mysqli_stmt_execute($stmt))
+        {
+            // STORE THE RESULT
+            mysqli_stmt_store_result($stmt);
+
+            if(mysqli_stmt_num_rows($stmt) == 1)
+            {
+                // BIND THE RESULT VARIABLES
+                mysqli_stmt_bind_result($stmt, $user_id, $firstname, $lastname, $hashed_password);
+            
+                if(mysqli_stmt_fetch($stmt))
+                {
+                    if(password_verify($password, $hashed_password))
+                    {
+                        // PASSWORD IS CORRECT, START NEW SESSION
+                        session_start();
+
+                        // STORE DATA IN THE SESSION VARIABLE
+                        $_SESSION["loggedin"] = true;
+                        $_SESSION["id"] = $user_id;
+                        $_SESSION["firstname"] = $firstname;
+                        $_SESSION["lastname"] = $lastname;
+
+                        // REDIRECT TO WELCOME PAGE
+                        header("location: welcome.php");
+                    } else
+                    {
+                        $password_err = "The password you have entered was not valid.";
+                    }
+                }
+            } else
+            {
+                $firstname_err = "No Account found with that firstname";
+                $lastname_err = "No Account found with that lastname";
+            }
+        } else
+        {
+            echo "Something went wrong. Please try again later.";
+        }
+        // CLOSE THE STATEMENT
+        mysqli_stmt_close();
+    }
+    // CLOSE THE CONNECTION
+    mysqli_close($connect);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 350px; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <h2>Login</h2>
+        <p>Please fill in your credentials to login.</p>
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+            <div class="form-group <?php echo (isset($_POST["firstname"])) ? 'has-error' : ''; ?>">
+                <label>Firstname</label>
+                <input type="text" name="firstname" class="form-control" value="<?php echo $firstname; ?>">
+                <span class="help-block"><?php if(empty($_POST["firstname"])) {echo $firstname_err;} ?></span>
+            </div>
+            <div class="form-group <?php echo (empty($lastname_err)) ? 'has-error' : ''; ?>">
+                <label>Lastname</label>
+                <input type="text" name="lastname" class="form-control" value="<?php echo $lastname; ?>">
+                <span class="help-block"><?php if(!empty($lastname_err)) { echo $lastname_err; } ?></span>
+            </div>    
+            <div class="form-group <?php echo (!empty($password_err)) ? 'has-error' : ''; ?>">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control">
+                <span class="help-block"><?php echo $password_err; ?></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Login">
+            </div>
+            <p>Don't have an account? <a href="insert_user.php">Sign up now</a>.</p>
+        </form>
+    </div>    
+</body>
+</html>

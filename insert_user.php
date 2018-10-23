@@ -3,8 +3,8 @@
 //                                                 //
 //  Made by Kai Matolat                            //     
 //                                                 //
-//  Under the MIT License                          //
 //                                                 //
+//  Under the MIT License                          //
 //                                                 //
 /////////////////////////////////////////////////////
 
