@@ -35,11 +35,17 @@ CREATE TABLE registered_users (
     password VARCHAR(255) NOT NULL,
     email_address VARCHAR(255) NOT NULL,
     email_display VARCHAR(255) NOT NULL,
+    /* FORGOT TO AND AN OPT-IN/OPT-OUT FUNCTION FOR EMAIL DISPLAY. ADDED IT ON 30/10/2018 */
+    /* DID THE FOLLOWING 
+    ALTER TABLE registered_users 
+    ADD COLUMN display_email INT NOT NULL AFTER email_display;
+    */
+    display_email INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 /* REGISTERED USERS FRIENDS TABLE */
 CREATE TABLE registered_users_friends (
-    user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL FOREIGN KEY AUTO_INCREMENT,
     firstname VARCHAR(20) NOT NULL,
     lastname VARCHAR(20) NOT NULL,
     friends_with INT NOT NULL,

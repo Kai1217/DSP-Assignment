@@ -23,12 +23,13 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
-/* PHP CODE IN PROCEDURAL PARADIGM AND OBJECT ORIENTED PARADIGM */
+/* PHP CODE IN PROCEDURAL/FUNCTIONAL PARADIGM AND OBJECT ORIENTED PARADIGM */
 /* INCLUSION OF CONFIG.PHP */
 require_once "config.php";
 
-$firstname = $lastname = $password = $confirm_password = $email_address = $email_display = "";
-$firstname_err = $lastname_err = $password_err = $email_err = $confirm_password_err = "";
+// DECLARATION OF VARIABLES AND PARAMETER VARIABLES
+$firstname = $lastname = $password = $confirm_password = $email_address = $email_display = $checkbox = "";
+$firstname_err = $lastname_err = $password_err = $email_err = $confirm_password_err = $checkbox_err = "";
 
 // PROCESSING FORM DATA WHEN SUBMITTED BY CLIENT
 if($_SERVER["REQUEST_METHOD"] == "POST")
@@ -142,14 +143,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     }
 
     // CHECK FOR INPUT ERRORS BEFORE INSERTING INTO THE DATABASE
-    if(empty($firstname_err) && empty($lastname_err) && empty($password_err) && empty($confirm_password_err) && empty($email_err))
+    if(empty($firstname_err) && empty($lastname_err) && empty($password_err) && empty($confirm_password_err) && empty($email_err) && empty($checkbox_err))
     {
         // PREPARE THE INSERT STATEMENT
-        $sql = "INSERT INTO registered_users (firstname, lastname, `password`, `email_address`, email_display) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO registered_users (firstname, lastname, `password`, `email_address`, email_display, display_email) VALUES (?, ?, ?, ?, ?, ?)";
 
         if($stmt = $connect->prepare($sql))
         {
-            mysqli_stmt_bind_param($stmt, "sssss", $param_firstname, $param_lastname, $param_password, $param_email, $param_email_display);
+            mysqli_stmt_bind_param($stmt, "sssssi", $param_firstname, $param_lastname, $param_password, $param_email, $param_email_display, $param_checkbox);
 
             $param_firstname = $firstname;
             $param_lastname = $lastname;
@@ -173,14 +174,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     mysqli_close($connect);
 }
 ?>
-
+<!-- HTML CODE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <!-- CASCADING STYLE SHEETS LIBRARY - BOOTSTRAP 3.3.7 THROUGH A CONTENT DELIVERY NETWORK -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <!-- Local Styling -->    
     <style type="text/css">
         body {
             font: 14px sans-serif;
@@ -223,6 +226,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
             <label>Confirm Password</label>
             <input type="password" name="confirm_password" class="form-control" value="<?php echo $confirm_password; ?>">
             <span class="help-block"><?php echo $confirm_password_err; ?></span>
+        </div>
+        <div class="form-group" <?php echo (!empty($checkbox_err)) ? 'has-error' : ''; ?>">
+            <label>Would you like to display your Email?</label><br>
+            <input type="checkbox" name="checkbox" class="form-control" value="<?php echo $checkbox; ?>">
+            <span class="help-block"><?php echo $checkbox_err; ?></span>
         </div>
         <div class="form-group">
             <input type="submit" class="btn btn-success" value="Submit">
