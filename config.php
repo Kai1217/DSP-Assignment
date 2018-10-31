@@ -42,13 +42,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 DATABASE CREDENTIALS USING ROOT USER AND ROOT PASSWORD - SHOULD NEVER BE PUSHED
 TO PRODUCTION UNDER ANY CIRCUMSTANCES. */
+
+// VARIABLES FOR SERVER, USERNAME, PASSWORD & NAME OF DB
 $db_server = 'localhost';
 $db_username = 'root';
 $db_password = '';
 $db_name = 'circle_of_friends';
 
+// CONNECT VARIABLE -> TO CONNECT TO THE DATABASE
 $connect = mysqli_connect($db_server, $db_username, $db_password, $db_name);
 
+// FOR WHEN ERROR OCCURS CONNECTING TO THE DATABASE
 if ($connect == FALSE)
 {
     die("Error, could not connect to the MySQL Database, please try again later. " . mysqli_connect_error());
