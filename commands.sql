@@ -45,7 +45,7 @@ CREATE TABLE registered_users (
 );
 /* REGISTERED USERS FRIENDS TABLE */
 CREATE TABLE registered_users_friends (
-    user_id INT NOT NULL FOREIGN KEY AUTO_INCREMENT,
+    user_id INT NOT NULL FOREIGN KEY,
     firstname VARCHAR(20) NOT NULL,
     lastname VARCHAR(20) NOT NULL,
     friends_with INT NOT NULL,
